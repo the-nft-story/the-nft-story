@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt_specification>
+    <role>
+        You are an expert blockchain product manager and technical architect specializing in fully on-chain NFT projects. Your expertise spans smart contract design, decentralized storage patterns, and community-driven mechanics. You have deep knowledge of projects like Autoglyphs, Loot, and other fully on-chain NFTs that store all data directly in smart contracts rather than using external storage like IPFS.
+    </role>
+
+    <context>
+        <project_vision>
+            Create a fully on-chain, community-driven storytelling platform where participants mint NFTs representing words or phrases that collectively build an evolving narrative. Similar to Autoglyphs' approach, all story data must be stored directly on-chain within the smart contracts themselves.
+        </project_vision>
+        
+        <technical_constraints>
+            <constraint priority="critical">All story content MUST be stored on-chain in smart contracts</constraint>
+            <constraint priority="critical">No external dependencies (no IPFS, no external APIs)</constraint>
+            <constraint priority="high">Gas-efficient storage patterns required</constraint>
+            <constraint priority="high">Story must be reconstructable purely from blockchain data</constraint>
+        </technical_constraints>
+        
+        <target_audience>
+            <primary>Developers implementing the smart contracts and front-end</primary>
+            <secondary>AI coding assistants (Claude Code) for implementation guidance</secondary>
+            <tertiary>Project stakeholders and community members</tertiary>
+        </target_audience>
+    </context>
+
+    <task>
+        Generate a comprehensive Product Requirements Document (PRD) for an on-chain community storytelling NFT project. The PRD must be structured for both human comprehension and AI-assisted implementation.
+    </task>
+
+    <prd_structure>
+        <section name="executive_summary">
+            <requirement>Provide a concise overview of the project vision and core value proposition</requirement>
+            <requirement>Explain the fully on-chain approach and its benefits</requirement>
+            <requirement>Define success metrics and key outcomes</requirement>
+        </section>
+
+        <section name="technical_architecture">
+            <subsection name="smart_contract_design">
+                <requirement>Define the core contract structure for story storage</requirement>
+                <requirement>Specify word/phrase NFT minting mechanics</requirement>
+                <requirement>Detail on-chain storage optimization strategies</requirement>
+                <requirement>Include gas cost considerations and optimizations</requirement>
+                <example>
+                    Consider packed storage using bytes32 arrays for words
+                    Implement word indexing for efficient story reconstruction
+                    Use events for cost-effective historical data access
+                </example>
+            </subsection>
+            
+            <subsection name="data_structures">
+                <requirement>Define how story text is stored on-chain</requirement>
+                <requirement>Specify NFT metadata structure (fully on-chain)</requirement>
+                <requirement>Design word-to-owner mapping system</requirement>
+                <requirement>Create efficient story traversal mechanisms</requirement>
+            </subsection>
+            
+            <subsection name="tokenomics">
+                <requirement>Minting cost structure and pricing curves</requirement>
+                <requirement>Word selection and validation rules</requirement>
+                <requirement>Ownership and royalty mechanisms</requirement>
+                <requirement>Incentive alignment for quality contributions</requirement>
+            </subsection>
+        </section>
+
+        <section name="functional_requirements">
+            <category name="core_features">
+                <feature id="F001">
+                    <name>Word/Phrase Minting</name>
+                    <description>Users can mint NFTs representing story words</description>
+                    <acceptance_criteria>
+                        - User can submit word/phrase for minting
+                        - Smart contract validates and stores word on-chain
+                        - NFT is minted with on-chain metadata
+                        - Word is permanently added to story sequence
+                    </acceptance_criteria>
+                </feature>
+                
+                <feature id="F002">
+                    <name>On-Chain Story Rendering</name>
+                    <description>Full story can be reconstructed from blockchain</description>
+                    <acceptance_criteria>
+                        - Contract provides method to read complete story
+                        - Story maintains proper word ordering
+                        - No external calls required for story access
+                    </acceptance_criteria>
+                </feature>
+                
+                <feature id="F003">
+                    <name>Story Visualization Interface</name>
+                    <description>Web interface to display evolving story</description>
+                    <acceptance_criteria>
+                        - Real-time story updates as new words are minted
+                        - Visual representation of word ownership
+                        - Interactive exploration of story history
+                    </acceptance_criteria>
+                </feature>
+            </category>
+            
+            <category name="governance_features">
+                <feature id="G001">
+                    <name>Content Moderation Rules</name>
+                    <description>On-chain rules for acceptable content</description>
+                </feature>
+                
+                <feature id="G002">
+                    <name>Story Branch Management</name>
+                    <description>Mechanism for handling story branches or chapters</description>
+                </feature>
+            </category>
+        </section>
+
+        <section name="implementation_specifications">
+            <smart_contracts>
+                <contract name="StoryNFT">
+                    <responsibilities>
+                        - Store all story words directly on-chain
+                        - Manage NFT minting and ownership
+                        - Provide story reconstruction functions
+                        - Implement gas-efficient storage patterns
+                    </responsibilities>
+                    <key_functions>
+                        - mintWord(string memory word) returns (uint256 tokenId)
+                        - getStorySegment(uint256 startIndex, uint256 endIndex) returns (string memory)
+                        - getFullStory() returns (string memory)
+                        - getWordMetadata(uint256 tokenId) returns (WordMetadata memory)
+                    </key_functions>
+                </contract>
+                
+                <contract name="StoryRenderer">
+                    <responsibilities>
+                        - Generate on-chain SVG representations
+                        - Create readable story formats
+                        - Handle metadata URI generation
+                    </responsibilities>
+                </contract>
+            </smart_contracts>
+            
+            <frontend_requirements>
+                <tech_stack>
+                    - Framework: React/Next.js recommended
+                    - Web3 Integration: ethers.js or wagmi
+                    - Styling: Tailwind CSS for rapid development
+                </tech_stack>
+                <key_components>
+                    - Story display with word-by-word rendering
+                    - Minting interface with word preview
+                    - Ownership visualization
+                    - Transaction history viewer
+                </key_components>
+            </frontend_requirements>
+        </section>
+
+        <section name="testing_requirements">
+            <test_scenarios>
+                <scenario>Gas cost analysis for various story lengths</scenario>
+                <scenario>Stress testing with thousands of words</scenario>
+                <scenario>Story reconstruction performance</scenario>
+                <scenario>Edge cases for special characters and unicode</scenario>
+            </test_scenarios>
+        </section>
+
+        <section name="success_metrics">
+            <metric>Total words minted</metric>
+            <metric>Unique participants</metric>
+            <metric>Story coherence score</metric>
+            <metric>Gas efficiency compared to similar projects</metric>
+            <metric>Community engagement rate</metric>
+        </section>
+
+        <section name="deployment_strategy">
+            <phase number="1">
+                <name>Testnet Launch</name>
+                <tasks>
+                    - Deploy contracts to Sepolia/Goerli
+                    - Limited beta with core community
+                    - Gas optimization iterations
+                </tasks>
+            </phase>
+            <phase number="2">
+                <name>Mainnet Soft Launch</name>
+                <tasks>
+                    - Deploy optimized contracts
+                    - Gradual community onboarding
+                    - Monitor gas costs and usage patterns
+                </tasks>
+            </phase>
+            <phase number="3">
+                <name>Full Public Launch</name>
+                <tasks>
+                    - Marketing campaign
+                    - Community events
+                    - Partnership announcements
+                </tasks>
+            </phase>
+        </section>
+    </prd_structure>
+
+    <output_instructions>
+        <format>
+            - Use clear hierarchical structure with numbered sections
+            - Include code snippets where helpful
+            - Provide specific implementation details
+            - Add diagrams using ASCII art or markdown where beneficial
+            - Include gas optimization tips throughout
+        </format>
+        
+        <ai_implementation_notes>
+            - Mark critical implementation points with [AI_IMPLEMENT] tags
+            - Include specific Solidity patterns and best practices
+            - Provide testable acceptance criteria for each feature
+            - Reference similar on-chain projects for patterns
+        </ai_implementation_notes>
+        
+        <completeness_checklist>
+            - [ ] All data storage is fully on-chain
+            - [ ] Gas costs are considered and optimized
+            - [ ] No external dependencies introduced
+            - [ ] Front-end can operate using only blockchain data
+            - [ ] Implementation is feasible with current technology
+            - [ ] Security considerations are addressed
+            - [ ] Upgrade path is defined (if applicable)
+        </completeness_checklist>
+    </output_instructions>
+
+    <examples>
+        <reference_projects>
+            <project name="Autoglyphs">
+                <learning>Complete on-chain art generation and storage</learning>
+                <pattern>Self-contained contract with no external dependencies</pattern>
+            </project>
+            <project name="Loot">
+                <learning>On-chain metadata generation</learning>
+                <pattern>Composable NFTs with on-chain attributes</pattern>
+            </project>
+            <project name="Nouns">
+                <learning>Daily minting mechanics</learning>
+                <pattern>Community governance integration</pattern>
+            </project>
+        </reference_projects>
+    </examples>
+
+    <critical_considerations>
+        <consideration priority="1">
+            Storage costs increase with story length - implement efficient packing
+
+            Maybe we dont't need to store the entire story but make the NFTs into a doubly-linked list 
+            so we can traverse the story without storing it all in one place?
+        </consideration>
+        <consideration priority="1">
+            The overall technical architecture should reflect the principal of "Do The Simplest Thing That Could Possibly Work". 
+            Avoid over-engineering while ensuring all requirements are met. This will just be the "prologue" chapter and we can
+            solve more problems in future chapters.
+        </consideration>
+        <consideration priority="2">
+            Reading stories should be equivalent to using a block viewer.
+        </consideration>
+        <consideration priority="3">
+            Unicode and special characters need careful handling
+        </consideration>
+        <consideration priority="4">
+            Stories will be presented as chapters where each chapter is a separate contract. The first iteration of 
+            this story will be the "prologue" and then as we iterate and improve on contracts and add different functionality
+            we'll add new chapters. Each chapter will be limited to a certain number of words. 
+        </consideration>
+    </critical_considerations>
+</prompt_specification>
