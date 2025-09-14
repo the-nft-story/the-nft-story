@@ -4,12 +4,12 @@ This document outlines the immediate next steps and features to be implemented f
 
 ## Phase 0: Foundation & CI Setup (IMMEDIATE PRIORITY)
 
-### CI/CD Pipeline Setup
-- [ ] **GitHub Actions Workflow** - Automated testing and deployment
-  - Set up Foundry CI for smart contract testing
-  - Add linting and formatting checks
-  - Configure test coverage reporting
-  - Set up automatic security analysis
+### Reproducible Development Environment (Docker)
+- [ ] **Docker Development Environment** - Containerized Foundry setup
+  - Create minimal Dockerfile with Foundry installation
+  - Configure docker-compose.yml for development workflow
+  - Add .dockerignore for optimized build context
+  - Enable hot-reload for contract development
 
 - [ ] **Hello World Contract** - Minimal viable implementation
   ```solidity
@@ -41,31 +41,40 @@ This document outlines the immediate next steps and features to be implemented f
   }
   ```
 
-### Development Environment
-- [ ] **Foundry Setup** - Modern Solidity development toolkit
-  - Initialize Foundry project structure
-  - Configure foundry.toml with optimization settings
-  - Set up remappings for dependencies
-  - Add gas reporting configuration
+### CI/CD Pipeline Setup
+- [ ] **GitHub Actions Workflow** - Docker-based automated testing
+  - Use Docker container for consistent CI environment
+  - Run Foundry tests with gas reporting
+  - Add basic linting and formatting checks
+  - Generate test coverage report
 
-- [ ] **Project Structure**
-  ```
-  contracts/
-  ├── src/
-  │   └── HelloStory.sol
-  ├── test/
-  │   └── HelloStory.t.sol
-  ├── script/
-  │   └── Deploy.s.sol
-  └── foundry.toml
-  ```
+### Project Structure (Minimal)
+```
+the-nft-story/
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── contracts/
+│   ├── src/
+│   │   └── HelloStory.sol
+│   ├── test/
+│   │   └── HelloStory.t.sol
+│   ├── script/
+│   │   └── Deploy.s.sol
+│   └── foundry.toml
+└── scripts/
+    ├── dev.sh       # Start development environment
+    ├── test.sh      # Run tests in Docker
+    └── build.sh     # Build contracts in Docker
+```
 
 ### Success Criteria
-- [ ] CI pipeline runs successfully on every commit
-- [ ] Hello world contract compiles without warnings
+- [ ] Docker development environment works on any machine with Docker installed
+- [ ] Hello world contract compiles without warnings in Docker container
 - [ ] Single test passes and validates basic functionality
-- [ ] Gas reporting shows reasonable costs
-- [ ] Code coverage report generated
+- [ ] CI pipeline runs successfully using Docker container
+- [ ] Gas reporting shows reasonable costs (<50k gas per addWord)
+- [ ] Development workflow documented for team onboarding
 
 ## Phase 1: Core Smart Contract Implementation
 
@@ -204,8 +213,26 @@ This document outlines the immediate next steps and features to be implemented f
 
 ## Development Environment Setup
 
-Once project structure is created:
-- Smart contracts: Foundry or Hardhat
+### Docker-First Approach (Phase 0)
+The minimal development setup uses Docker to ensure reproducibility:
+
+```bash
+# Start development environment
+docker-compose up -d
+
+# Run tests
+./scripts/test.sh
+
+# Build contracts
+./scripts/build.sh
+
+# Interactive development shell
+docker-compose exec foundry bash
+```
+
+### Future Phases
+Once Docker foundation is established:
+- Smart contracts: Foundry (containerized)
 - Frontend: Next.js 14 with TypeScript
 - Web3: wagmi + viem
 - Styling: Tailwind CSS

@@ -24,7 +24,49 @@ This project is designed as a comprehensive Web3 learning experience covering:
 
 ## 🚀 Getting Started
 
-*Project structure will be initialized in upcoming commits*
+### Prerequisites
+
+1. **Install Docker and Docker Compose**
+   - Follow the [official Docker installation guide](https://docs.docker.com/engine/install/) for your operating system
+
+2. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd the-nft-story
+   ```
+
+### Development Environment
+
+This project uses Docker for a reproducible development environment. The minimal setup follows the "Do The Simplest Thing That Could Possibly Work" philosophy.
+
+**Quick Start:**
+```bash
+# Start development environment
+./scripts/dev.sh
+
+# Build contracts
+./scripts/build.sh
+
+# Run tests
+./scripts/test.sh
+
+# Interactive development shell
+docker-compose exec foundry bash
+```
+
+**Development Workflow:**
+```bash
+# Start the development container
+docker-compose up -d foundry
+
+# Enter the container for interactive development
+docker-compose exec foundry bash
+
+# Inside container - standard Foundry commands work:
+forge build
+forge test
+forge test --gas-report
+```
 
 ## 📖 Documentation
 
