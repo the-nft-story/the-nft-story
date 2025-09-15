@@ -1,12 +1,18 @@
-#!/bin/bash
-# Start development environment
-# Minimal script following "Do The Simplest Thing That Could Possibly Work"
+#!/usr/bin/env bash
+# Start development shell inside Foundry Docker container
 
-set -e
+set -euo pipefail
 
-echo "Starting NFT Story development environment..."
+echo ""
+echo "Starting Foundry development container..."
+echo ""
+
 docker-compose up -d foundry
 
-echo "Development container is running. Use:"
-echo "  docker-compose exec foundry bash"
-echo "to enter the development shell."
+docker-compose exec foundry forge --version
+
+echo ""
+echo "Entering Foundry container shell. Type 'exit' to leave."
+echo ""
+
+docker-compose exec foundry bash

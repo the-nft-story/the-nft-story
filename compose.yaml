@@ -1,16 +1,13 @@
-# Minimal Docker Compose for Foundry development
 # Reference: https://getfoundry.sh/guides/foundry-in-docker
-version: '3.8'
-
 services:
-  # Development container for building and testing
+  # Foundry development container for the backend contracts
   foundry:
-    build: .
-    container_name: nft-story-foundry
+    image: ghcr.io/foundry-rs/foundry:latest
+    container_name: foundry
+    working_dir: /contracts
     volumes:
-      - .:/app
-      - foundry-cache:/root/.foundry
-    working_dir: /app
+      - ./contracts:/contracts
+    command: /bin/bash
     stdin_open: true
     tty: true
 
@@ -23,6 +20,3 @@ services:
     command: anvil --host 0.0.0.0
     profiles:
       - anvil
-
-volumes:
-  foundry-cache:

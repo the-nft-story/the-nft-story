@@ -1,6 +1,0 @@
-# Only ignore files/folders that currently exist
-.git
-docs/
-scripts/
-README.md
-CLAUDE.md

@@ -125,40 +125,86 @@ This repository currently contains only the Product Requirements Document (`docs
 
 ## Development Commands
 
-### Smart Contract Development (Foundry)
+### Automatic Environment Setup (RECOMMENDED)
+**STATUS**: ✅ Auto-environment integration completed
+
+**Option 1: direnv (Universal)**
 ```bash
-# Initialize project (when project structure is created)
-forge init contracts
+# Install direnv (one-time setup)
+# macOS: brew install direnv
+# Ubuntu: sudo apt install direnv
+# Add hook to shell profile: eval "$(direnv hook bash)" or eval "$(direnv hook zsh)"
 
-# Build contracts
-forge build
+# Enable for this project (one-time)
+direnv allow
 
-# Run tests with gas reporting
-forge test --gas-report
-
-# Run specific test
-forge test --match-test testAddAndRetrieveWord
-
-# Test with coverage
-forge coverage
-
-# Deploy to Sepolia testnet
-forge script script/Deploy.s.sol --rpc-url https://sepolia.infura.io/v3/YOUR_KEY --broadcast --verify
-
-# Deploy to local anvil testnet (for development)
-forge script script/Deploy.s.sol --rpc-url http://localhost:8545
-
-# Security analysis
-slither src/
+# Environment auto-loads when entering directory!
+# Use 'direnv block' to temporarily disable
 ```
 
-### CI/CD Commands
+**Option 2: Manual sourcing (Fallback)**
 ```bash
-# Local CI simulation
+# Source environment manually
+source scripts/init-env.sh
+
+# Exit environment
+deactivate
+```
+
+**VSCode Integration**:
+- Terminals automatically use nft-story environment
+- Use Command Palette → "Tasks: Run Task" for common operations
+- Recommended extensions auto-suggested on project open
+
+### Docker Development Environment (CURRENT)
+**STATUS**: ✅ Docker environment completed (commit 0fc764b)
+
+```bash
+# Quick Start (with auto-environment via direnv or source scripts/init-env.sh)
+forge build         # Build contracts (auto-Docker)
+forge test          # Run tests (auto-Docker)
+clean               # Clean and rebuild environment
+dev                 # Interactive development shell
+
+# manual commands (still work)
+./scripts/dev.sh     # Start development environment
+./scripts/build.sh   # Build contracts in Docker
+./scripts/test.sh    # Run tests in Docker
+
+# Interactive Development
+docker-compose up -d foundry            # Start container
+docker-compose exec foundry bash        # Enter development shell
+
+# Inside container - standard Foundry commands:
+forge build
+forge test --gas-report
+forge test --match-test testAddAndRetrieveWord
+forge coverage
+```
+
+### Smart Contract Development (Foundry in Docker)
+```bash
+# Initialize project (NEXT STEP after Docker installation)
+docker-compose run --rm foundry forge init contracts
+
+# Build contracts
+docker-compose run --rm foundry forge build
+
+# Run tests with gas reporting
+docker-compose run --rm foundry forge test --gas-report
+
+# Deploy to local anvil (optional)
+docker-compose --profile anvil up -d anvil  # Start local blockchain
+docker-compose run --rm foundry forge script script/Deploy.s.sol --rpc-url http://anvil:8545
+```
+
+### CI/CD Commands (TODO)
+```bash
+# Local CI simulation (future)
 act push  # If using act to test GitHub Actions locally
 
-# Manual test run (matches CI)
-forge test --gas-report && forge coverage
+# Manual test run (matches future CI)
+./scripts/test.sh && docker-compose run --rm foundry forge coverage
 ```
 
 ### Expected Full Project Workflow (Future)
@@ -174,12 +220,21 @@ forge test --gas-report && forge coverage
 
 ## Implementation Priorities
 
-### IMMEDIATE (Milestone 0 - Day 1)
-**CRITICAL**: Set up CI foundation before any other work
-1. **CI/CD Pipeline**: GitHub Actions with Foundry, gas reporting, coverage
+### COMPLETED ✅ (Phase 0 Foundation - Session 1)
+1. **Docker Development Environment**: Containerized Foundry setup with official images
+   - ✅ Minimal Dockerfile using `ghcr.io/foundry-rs/foundry:latest`
+   - ✅ docker-compose.yml with foundry service and optional anvil blockchain
+   - ✅ Development scripts: dev.sh, test.sh, build.sh
+   - ✅ .dockerignore optimized for existing files only
+   - ✅ Updated README.md with comprehensive developer instructions
+   - ✅ Committed changes (commit 0fc764b)
+
+### IMMEDIATE NEXT (After Docker Installation)
+**CRITICAL**: User must install Docker first, then initialize Foundry project
+1. **Docker Installation**: User needs to install Docker using provided commands
 2. **Hello World Contract**: Minimal `HelloStory.sol` with string array storage
 3. **Single Test Suite**: Comprehensive test validating add/retrieve functionality
-4. **Development Environment**: Foundry setup with proper configuration
+4. **Foundry Project Init**: Initialize contracts/ directory structure
 
 ### Next (Milestone 1 - Weeks 1-2)
 1. **StoryPrologue Contract**: Full implementation with NFT functionality

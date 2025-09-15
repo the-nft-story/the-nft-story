@@ -37,6 +37,15 @@ out/
 broadcast/
 artifacts/
 
+# Foundry specific (from contracts/ directory)
+contracts/cache/
+contracts/out/
+contracts/docs/
+# Keep broadcast logs except for local and dry-run
+!contracts/broadcast
+contracts/broadcast/*/31337/
+contracts/broadcast/**/dry-run/
+
 # Coverage reports
 coverage/
 lcov.info

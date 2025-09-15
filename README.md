@@ -37,35 +37,36 @@ This project is designed as a comprehensive Web3 learning experience covering:
 
 ### Development Environment
 
-This project uses Docker for a reproducible development environment. The minimal setup follows the "Do The Simplest Thing That Could Possibly Work" philosophy.
+This project uses Docker for a reproducible development environment with automatic environment setup. Choose one of the two options below:
 
-**Quick Start:**
+**Option 1: Automatic Environment (Recommended)**
 ```bash
-# Start development environment
-./scripts/dev.sh
+# Install direnv (one-time setup)
+# https://direnv.net/docs/installation.html
 
-# Build contracts
-./scripts/build.sh
-
-# Run tests
-./scripts/test.sh
-
-# Interactive development shell
-docker-compose exec foundry bash
+# Enable for this project (one-time)
+direnv allow
 ```
 
-**Development Workflow:**
+**Option 2: Manual Environment**
 ```bash
-# Start the development container
-docker-compose up -d foundry
+# Source environment manually each session
+source scripts/init-env.sh
 
-# Enter the container for interactive development
+# Exit environment when done
+deactivate
+```
+
+**Advanced Development (Direct Docker):**
+```bash
+# Alternative: Direct Docker commands (not needed with environment setup above)
+docker-compose up -d foundry
 docker-compose exec foundry bash
 
-# Inside container - standard Foundry commands work:
-forge build
-forge test
-forge test --gas-report
+# Or use scripts directly:
+./scripts/dev.sh     # Start development environment
+./scripts/build.sh   # Build contracts in Docker
+./scripts/test.sh    # Run tests in Docker
 ```
 
 ## 📖 Documentation
