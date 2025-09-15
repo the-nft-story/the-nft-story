@@ -11,9 +11,9 @@ This document outlines the immediate next steps and features to be implemented f
   - Add .dockerignore for optimized build context
   - Enable hot-reload for contract development
 
-- [ ] **Hello World Contract** - Minimal viable implementation
+- [ ] **HelloWorld Contract** - Minimal viable implementation
   ```solidity
-  contract HelloStory {
+  contract HelloWorld {
       string[] public words;
 
       function addWord(string memory word) external {
@@ -34,10 +34,10 @@ This document outlines the immediate next steps and features to be implemented f
   ```solidity
   function testAddAndRetrieveWord() public {
       string memory testWord = "hello";
-      helloStory.addWord(testWord);
+      helloWorld.addWord(testWord);
 
-      assertEq(helloStory.getWordCount(), 1);
-      assertEq(helloStory.getWord(0), testWord);
+      assertEq(helloWorld.getWordCount(), 1);
+      assertEq(helloWorld.getWord(0), testWord);
   }
   ```
 
@@ -56,9 +56,9 @@ the-nft-story/
 ├── .dockerignore
 ├── contracts/
 │   ├── src/
-│   │   └── HelloStory.sol
+│   │   └── HelloWorld.sol
 │   ├── test/
-│   │   └── HelloStory.t.sol
+│   │   └── HelloWorld.t.sol
 │   ├── script/
 │   │   └── Deploy.s.sol
 │   └── foundry.toml
@@ -134,7 +134,7 @@ the-nft-story/
   - Deploy and verify contracts on Sepolia
   - Test with small community (10-20 users) using testnet ETH
   - Gather real gas cost data and optimize for mainnet deployment
-  - Validate gas targets: <50k for HelloStory, <100k for StoryPrologue
+  - Validate gas targets: <50k for HelloWorld, <100k for StoryPrologue
 
 - [ ] **Security Audit**
   - Reentrancy testing
@@ -201,7 +201,7 @@ the-nft-story/
 ## Success Criteria
 
 ### Technical
-- [ ] Gas cost <100k per word mint (StoryPrologue), <50k per word (HelloStory)
+- [ ] Gas cost <100k per word mint (StoryPrologue), <50k per word (HelloWorld)
 - [ ] Story loads in <2 seconds for 100 words
 - [ ] Zero data loss (all words recoverable from blockchain)
 - [ ] Mobile usability on iOS/Android

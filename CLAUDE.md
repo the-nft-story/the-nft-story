@@ -57,7 +57,7 @@ Example: "For word storage, we have 3 main approaches: (1) mapping with counters
 - Provide clarification if answers reveal knowledge gaps
 - Adapt future explanations based on understanding level
 
-Example: "Before we implement the HelloStory contract, let me check your understanding: (1) Why do we use `string[]` instead of `mapping(uint256 => string)`? (2) What's the gas implication of our choice? (3) How will this affect our frontend data loading?"
+Example: "Before we implement the HelloWorld contract, let me check your understanding: (1) Why do we use `string[]` instead of `mapping(uint256 => string)`? (2) What's the gas implication of our choice? (3) How will this affect our frontend data loading?"
 
 ## Key Architecture Decisions
 
@@ -232,7 +232,7 @@ act push  # If using act to test GitHub Actions locally
 ### IMMEDIATE NEXT (After Docker Installation)
 **CRITICAL**: User must install Docker first, then initialize Foundry project
 1. **Docker Installation**: User needs to install Docker using provided commands
-2. **Hello World Contract**: Minimal `HelloStory.sol` with string array storage
+2. **HelloWorld Contract**: Minimal `HelloWorld.sol` with string array storage
 3. **Single Test Suite**: Comprehensive test validating add/retrieve functionality
 4. **Foundry Project Init**: Initialize contracts/ directory structure
 
@@ -275,14 +275,14 @@ act push  # If using act to test GitHub Actions locally
 
 ### Testing Strategy by Phase
 
-#### Phase 0: HelloStory Contract
+#### Phase 0: HelloWorld Contract
 ```solidity
 // Example TDD approach:
 // 1. RED: Write test for adding first word
 function testAddFirstWord() public {
-    helloStory.addWord("hello");
-    assertEq(helloStory.getWordCount(), 1);
-    assertEq(helloStory.getWord(0), "hello");
+    helloWorld.addWord("hello");
+    assertEq(helloWorld.getWordCount(), 1);
+    assertEq(helloWorld.getWord(0), "hello");
 }
 
 // 2. GREEN: Implement minimal addWord() function
@@ -336,7 +336,7 @@ After each TDD cycle, quiz understanding:
 // Educational gas testing approach
 function testGasCosts() public {
     uint256 gasBefore = gasleft();
-    helloStory.addWord("test");
+    helloWorld.addWord("test");
     uint256 gasUsed = gasBefore - gasleft();
 
     // Educational assertion with explanation
@@ -353,12 +353,12 @@ function testGasCosts() public {
 - **Development tools**: Foundry ecosystem, debugging techniques
 - **Deployment**: Testnet vs mainnet, verification, monitoring
 
-## Hello World Contract Specification
+## HelloWorld Contract Specification
 
 The immediate task is implementing this minimal contract to validate the entire development stack:
 
 ```solidity
-contract HelloStory {
+contract HelloWorld {
     string[] public words;
     event WordAdded(uint256 indexed index, string word);
 
