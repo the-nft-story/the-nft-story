@@ -3,16 +3,13 @@
 
 set -euo pipefail
 
-echo ""
-echo "Starting Foundry development container..."
-echo ""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIRECTORY="$(dirname "$SCRIPT_DIR")"
 
-docker-compose up -d foundry
-
-docker-compose exec foundry forge --version
+cd "$PROJECT_DIRECTORY"
 
 echo ""
 echo "Entering Foundry container shell. Type 'exit' to leave."
 echo ""
 
-docker-compose exec foundry bash
+docker compose run --rm -it foundry bash

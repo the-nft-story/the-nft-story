@@ -7,9 +7,6 @@ services:
     working_dir: /contracts
     volumes:
       - ./contracts:/contracts
-    command: /bin/bash
-    stdin_open: true
-    tty: true
 
   # Local blockchain for testing
   anvil:

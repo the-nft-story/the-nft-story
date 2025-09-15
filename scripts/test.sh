@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Proxy for the 'forge' command using Docker Compose
-# Usage: ./scripts/forge.sh [forge arguments]
+# Test runner script
+# Usage: ./scripts/test.sh
 
 set -euo pipefail
 
@@ -9,5 +9,5 @@ PROJECT_DIRECTORY="$(dirname "$SCRIPT_DIR")"
 
 cd "$PROJECT_DIRECTORY"
 
-CMD="forge $*"
+CMD="forge test $*"
 docker-compose run --rm foundry "$CMD"
