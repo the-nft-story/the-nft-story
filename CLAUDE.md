@@ -73,16 +73,6 @@ Example: "Before we implement the HelloWorld contract, let me check your underst
 - **Pure on-chain**: All story data must be readable from contract storage without external dependencies
 - **Chapter evolution**: Future chapters can experiment with governance/moderation based on lessons learned
 
-### Core Data Structure
-```solidity
-struct WordNFT {
-    string word;           // The actual word/phrase
-    address author;        // Who contributed it
-    uint256 timestamp;     // When it was added
-}
-
-WordNFT[] public words;    // Sequential story storage
-```
 
 ### Frontend Strategy
 - **Next.js 14** with App Router
@@ -125,91 +115,147 @@ This repository currently contains only the Product Requirements Document (`docs
 
 ## Development Commands
 
-### Automatic Environment Setup (RECOMMENDED)
-**STATUS**: ✅ Auto-environment integration completed
-
-**Option 1: direnv (Universal)**
+### Quick Start
 ```bash
-# Install direnv (one-time setup)
-# macOS: brew install direnv
-# Ubuntu: sudo apt install direnv
-# Add hook to shell profile: eval "$(direnv hook bash)" or eval "$(direnv hook zsh)"
+# Get help with all available commands
+make help
 
-# Enable for this project (one-time)
-direnv allow
+# Initialize the project (first time only)
+make setup
 
-# Environment auto-loads when entering directory!
-# Use 'direnv block' to temporarily disable
-```
-
-**Option 2: Manual sourcing (Fallback)**
-```bash
-# Source environment manually
-source scripts/init-env.sh
-
-# Exit environment
-deactivate
-```
-
-**VSCode Integration**:
-- Terminals automatically use nft-story environment
-- Use Command Palette → "Tasks: Run Task" for common operations
-- Recommended extensions auto-suggested on project open
-
-### Docker Development Environment (CURRENT)
-**STATUS**: ✅ Docker environment completed (commit 0fc764b)
-
-```bash
-# Quick Start (with auto-environment via direnv or source scripts/init-env.sh)
-forge build         # Build contracts (auto-Docker)
-forge test          # Run tests (auto-Docker)
-clean               # Clean and rebuild environment
-dev                 # Interactive development shell
-
-# manual commands (still work)
-./scripts/dev.sh     # Start development environment
-./scripts/build.sh   # Build contracts in Docker
-./scripts/test.sh    # Run tests in Docker
-
-# Interactive Development
-docker-compose up -d foundry            # Start container
-docker-compose exec foundry bash        # Enter development shell
-
-# Inside container - standard Foundry commands:
-forge build
-forge test --gas-report
-forge test --match-test testAddAndRetrieveWord
-forge coverage
+# Build and test workflow
+make build && make test
 ```
 
 ### Smart Contract Development (Foundry in Docker)
+
+#### Environment Setup
 ```bash
-# Initialize project (NEXT STEP after Docker installation)
-docker-compose run --rm foundry forge init contracts
-
-# Build contracts
-docker-compose run --rm foundry forge build
-
-# Run tests with gas reporting
-docker-compose run --rm foundry forge test --gas-report
-
-# Deploy to local anvil (optional)
-docker-compose --profile anvil up -d anvil  # Start local blockchain
-docker-compose run --rm foundry forge script script/Deploy.s.sol --rpc-url http://anvil:8545
+make setup          # Initialize foundry project and install dependencies
+make install        # Alias for setup
+make deps           # Install/update foundry dependencies
+make clean          # Clean build artifacts and Docker environment
 ```
 
-### CI/CD Commands (TODO)
+#### Development Environment
 ```bash
-# Local CI simulation (future)
-act push  # If using act to test GitHub Actions locally
-
-# Manual test run (matches future CI)
-./scripts/test.sh && docker-compose run --rm foundry forge coverage
+make dev            # Open interactive development shell (eth-security-toolbox)
+make shell          # Alias for dev
+make logs           # Show container logs
+make status         # Show development environment status
 ```
 
-### Expected Full Project Workflow (Future)
-- **Frontend**: `npm run dev`, `npm run build`, `npm run test`
-- **Full Project**: `npm run dev:all` (contracts + frontend)
+#### Building & Compilation
+```bash
+make build          # Compile smart contracts
+make watch          # Watch for changes and rebuild/test automatically
+```
+
+#### Testing
+```bash
+make test           # Run all tests
+make gas-report     # Run tests with detailed gas reporting
+make test-coverage  # Run tests with coverage analysis
+make test-cov       # Alias for test-coverage
+```
+
+#### Code Quality & Security
+```bash
+make lint           # Run Solhint linter for code quality
+make format         # Format Solidity code with forge fmt
+make fmt            # Alias for format
+make format-check   # Check if code is properly formatted
+make slither        # Run Slither security analysis (full output with JSON)
+make security       # Run complete security analysis (Slither + lint)
+```
+
+#### Documentation & Inspection
+```bash
+make docs           # Generate contract documentation
+make inspect CONTRACT=HelloWorld  # Inspect specific contract (ABI, bytecode, gas estimates)
+make version        # Show Foundry tool versions
+```
+
+#### Debugging
+```bash
+make trace TX=0x...  # Trace a specific transaction hash
+```
+
+### Docker Services Available
+
+#### Foundry Service
+- **Image**: `ghcr.io/foundry-rs/foundry:latest`
+- **Purpose**: Smart contract compilation, testing, and deployment
+- **Working Directory**: `/workspace/contracts`
+- **Volume**: Persistent cache for dependencies
+
+#### Security Toolbox (dev)
+- **Image**: `ghcr.io/trailofbits/eth-security-toolbox:nightly`
+- **Purpose**: Security analysis with Slither, interactive development
+- **Access**: `make dev` for interactive shell
+
+#### Solhint Linter
+- **Image**: `protodb/protofire-solhint:latest`
+- **Purpose**: Solidity code quality analysis
+- **Usage**: Activated automatically with `make lint`
+
+### Development Workflow
+
+#### Daily Development
+```bash
+# 1. Start development
+make build          # Ensure everything compiles
+
+# 2. Test-driven development
+make test           # Run existing tests
+# Write new tests, then implement features
+
+# 3. Code quality checks
+make format         # Format code
+make lint           # Check code quality
+make security       # Security analysis
+
+# 4. Gas optimization
+make gas-report     # Monitor gas usage
+```
+
+#### Project Setup (First Time)
+```bash
+# 1. Clone and enter project
+git clone <repo-url>
+cd the-nft-story
+
+# 2. Initialize environment
+make setup
+
+# 3. Verify setup
+make build
+make test
+make version
+```
+
+### CI/CD Integration
+
+#### Local CI Simulation
+```bash
+# Run full CI pipeline locally
+make build && make test && make security && make format-check
+```
+
+#### Expected CI Pipeline (Future)
+- ✅ Build contracts: `make build`
+- ✅ Run tests: `make test`
+- ✅ Security analysis: `make security`
+- ✅ Code formatting: `make format-check`
+- ✅ Gas reporting: `make gas-report`
+- ✅ Documentation: `make docs`
+
+### File Structure Integration
+- **Makefile**: Complete development workflow automation
+- **compose.yaml**: Docker services configuration
+- **foundry.env**: Environment variables for Foundry
+- **contracts/**: Foundry project with smart contracts
+- **SECURITY.md**: Security analysis documentation
 
 ## Key Files
 
@@ -217,6 +263,7 @@ act push  # If using act to test GitHub Actions locally
 - `docs/implementation-tasks.md` - Immediate next steps and features to implement
 - `docs/project-milestones.md` - Detailed roadmap with timelines and implementation notes
 - `docs/prompt.xml` - Original project prompt
+- `compose.yaml` - Docker compose configuration for this workspace
 
 ## Implementation Priorities
 
@@ -250,6 +297,7 @@ act push  # If using act to test GitHub Actions locally
 
 ### Critical Implementation Notes
 - **EDUCATIONAL FIRST**: Explain all decisions before implementing
+- **SECURITY FIRST**: Follow Trail of Bits security guidelines (see Security Development section below)
 - **CI FIRST**: No code changes without passing CI pipeline
 - **TEST-DRIVEN DEVELOPMENT**: Write tests before implementation (see TDD section below)
 - **NO external dependencies** - all story data must be readable from contract storage
@@ -352,48 +400,128 @@ function testGasCosts() public {
 - **Frontend Web3**: Wallet connections, transaction handling, event listening
 - **Development tools**: Foundry ecosystem, debugging techniques
 - **Deployment**: Testnet vs mainnet, verification, monitoring
+- **Security practices**: Following Trail of Bits guidelines, vulnerability prevention
 
-## HelloWorld Contract Specification
+## Security Development Guidelines
 
-The immediate task is implementing this minimal contract to validate the entire development stack:
+**MANDATORY**: This project follows [Trail of Bits' Building Secure Contracts](https://github.com/crytic/building-secure-contracts/tree/master/development-guidelines) guidelines for security-first development.
 
-```solidity
-contract HelloWorld {
-    string[] public words;
-    event WordAdded(uint256 indexed index, string word);
+### Design Phase Security Requirements
 
-    function addWord(string memory word) external {
-        require(bytes(word).length > 0, "Empty word not allowed");
-        require(bytes(word).length <= 50, "Word too long");
-        words.push(word);
-        emit WordAdded(words.length - 1, word);
-    }
+#### 1. Documentation Standards
+- **Plain English Description**: Every contract must have clear, non-technical documentation
+- **Architectural Diagrams**: Visual representation of system components and interactions
+- **NatSpec Documentation**: Complete `@notice`, `@param`, `@return` documentation for all functions
+- **Migration Procedures**: Document upgrade/migration strategies before implementation
 
-    function getWord(uint256 index) external view returns (string memory) {
-        require(index < words.length, "Index out of bounds");
-        return words[index];
-    }
+#### 2. Architecture Principles
+- **Minimize On-Chain Computation**: Keep complex logic off-chain when possible
+- **Prefer Migration Over Upgradeability**: Design for contract replacement rather than proxy patterns
+- **Simplicity First**: Keep contract logic comprehensible and auditable
+- **Modular Design**: Divide system into focused, single-responsibility contracts
 
-    function getWordCount() external view returns (uint256) {
-        return words.length;
-    }
-}
+### Implementation Security Standards
+
+#### 1. Code Structure Requirements
+- **Small Functions**: Maximum 20-30 lines per function for readability
+- **Careful Inheritance**: Document inheritance hierarchies and potential conflicts
+- **Event Logging**: Emit events for all critical state changes
+- **Battle-Tested Libraries**: Use OpenZeppelin for standard functionality
+
+#### 2. Security-Critical Practices
+- **Vulnerability Awareness**: Review [SWC Registry](https://swcregistry.io/) before coding
+- **Solidity Documentation**: Follow all warnings and best practices
+- **Avoid Assembly**: No inline assembly without explicit security review
+- **Dependency Management**: Pin exact versions, audit all dependencies
+
+### Security Testing Protocol
+
+#### 1. Automated Security Scanning (MANDATORY)
+- **Slither Integration**: Run `make security` on every commit
+- **Clean Reports**: Zero high/medium findings before merging
+- **Custom Properties**: Define contract-specific security properties
+
+#### 2. Contract-Specific Validation
+- **ERC Compliance**: Verify standard conformance with automated tests
+- **Access Controls**: Test all permission boundaries and role assignments
+- **State Transitions**: Validate all possible state changes are intentional
+- **External Interactions**: Test integration with other contracts/tokens
+
+#### 3. Property-Based Testing
+- **Invariant Testing**: Define and test system invariants with Echidna
+- **Fuzzing**: Generate random inputs to discover edge cases
+- **Symbolic Execution**: Use tools like Manticore for path exploration
+
+### Security Review Preparation
+
+#### 1. Visual Code Inspection
+- **Inheritance Graphs**: Generate and review contract inheritance trees
+- **Function Visibility**: Audit all function access modifiers
+- **State Variable Access**: Review storage variable visibility and mutability
+
+#### 2. Security Property Documentation
+Must document security properties for:
+- **State Machine**: Valid state transitions and access controls
+- **Arithmetic Operations**: Overflow/underflow protections
+- **External Interactions**: Reentrancy guards and call safety
+- **Standards Conformance**: ERC compliance and interface adherence
+
+#### 3. Threat Modeling
+- **Front-Running**: Identify and mitigate MEV vulnerabilities
+- **Privacy**: Document what information is publicly accessible
+- **DeFi Integration**: Assess risks of external protocol dependencies
+- **Upgrade Risks**: Document centralization and upgrade attack vectors
+
+### Development Workflow Security
+
+#### 1. Pre-Commit Requirements
+```bash
+# Security pipeline (all must pass)
+make build           # Compilation must succeed
+make test            # All tests must pass
+make security        # Security analysis must be clean
+make format-check    # Code formatting must be consistent
 ```
 
-**Educational Implementation Approach**:
-Before implementing, explain:
-- Why `string[]` vs `mapping(uint256 => string)` for word storage
-- Gas implications of dynamic arrays vs mappings
-- `require()` vs `revert()` vs custom errors for validation
-- Event indexing decisions and their impact on frontend querying
-- Testing strategy: what edge cases to cover and why
+#### 2. Code Review Standards
+- **Security Focus**: Every PR must include security analysis
+- **Threat Assessment**: Document new attack vectors introduced
+- **Gas Analysis**: Review gas costs for DoS attack resistance
+- **External Dependencies**: Audit any new library integrations
 
-**Success Criteria**:
-- CI passes with all tests green
-- Gas cost <50k per addWord (measured via tests)
-- 100% test coverage achieved through TDD
-- Complete understanding of each design decision (validated via quizzes)
-- All tests written BEFORE implementation code
+#### 3. Deployment Security
+- **Testnet First**: Deploy and test on testnets before mainnet
+- **Monitoring Setup**: Implement transaction monitoring and alerting
+- **Incident Response**: Have response plan ready before deployment
+- **Contact Information**: Add security contact to [security repositories](https://github.com/ethereum-lists/contracts-security-contacts)
+
+### Educational Security Learning
+
+#### 1. Security Quiz Integration
+After implementing security features, quiz understanding:
+- "What attack vectors does this guard against?"
+- "How could an attacker exploit this function?"
+- "What are the gas implications of this security measure?"
+- "How would you test this security property?"
+
+#### 2. Vulnerability Analysis
+- **Case Studies**: Study real-world exploit examples
+- **Code Reviews**: Analyze vulnerable contract patterns
+- **Security Tools**: Understand how Slither detects issues
+- **Best Practices**: Learn why certain patterns are dangerous
+
+#### 3. Security Resources
+- **Trail of Bits Guidelines**: https://github.com/crytic/building-secure-contracts
+- **Consensys Best Practices**: https://consensys.github.io/smart-contract-best-practices/
+- **Solidity Security**: https://docs.soliditylang.org/en/latest/security-considerations.html
+- **DeFi Security**: https://blog.trailofbits.com/2021/02/05/how-the-defi-space-represents-breaking-smart-contract-composability/
+
+### Security Metrics and KPIs
+- **Zero Critical/High Findings**: Slither reports must be clean
+- **100% Test Coverage**: All functions must have comprehensive tests
+- **Gas Efficiency**: Optimize for DoS resistance, not just cost
+- **Documentation Completeness**: All security properties documented
+- **Review Readiness**: Codebase prepared for professional security audit
 
 ## Educational Questions to Explore
 When implementing this contract, discuss:
