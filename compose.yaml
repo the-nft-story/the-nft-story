@@ -1,19 +1,49 @@
 # Reference: https://getfoundry.sh/guides/foundry-in-docker
 services:
+  # Ethereum security toolbox for smart contract development and analysis
+  dev:
+    image: ghcr.io/trailofbits/eth-security-toolbox:nightly
+    container_name: eth-security-toolbox
+    working_dir: /workspace/contracts
+    volumes:
+      - ./contracts:/workspace/contracts
+    networks:
+      - bridge-network
+    command: /bin/bash
+    tty: true
+
   # Foundry development container for the backend contracts
   foundry:
+    env_file: foundry.env
     image: ghcr.io/foundry-rs/foundry:latest
     container_name: foundry
-    working_dir: /contracts
+    working_dir: /workspace/contracts
     volumes:
-      - ./contracts:/contracts
+      - ./contracts:/workspace/contracts
+      - foundry-cache:/root/.foundry
+    networks:
+      - bridge-network
 
-  # Local blockchain for testing
-  anvil:
-    image: ghcr.io/foundry-rs/foundry:latest
-    container_name: nft-story-anvil
-    ports:
-      - "8545:8545"
-    command: anvil --host 0.0.0.0
+  # Solhint - Solidity linter
+  solhint:
+    image: protodb/protofire-solhint:latest
+    container_name: solhint
+    working_dir: /workspace/contracts
+    volumes:
+      - ./contracts:/workspace/contracts
+    command: solhint './src/**/*.sol' './script/**/*.sol' './test/**/*.sol'
     profiles:
-      - anvil
+      - tools
+
+# Named volumes for persistent data
+volumes:
+  foundry-cache:
+    driver: local
+
+# Bridge network for container communication
+networks:
+  bridge-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
