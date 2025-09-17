@@ -256,6 +256,7 @@ make build && make test && make security && make format-check
 - **foundry.env**: Environment variables for Foundry
 - **contracts/**: Foundry project with smart contracts
 - **SECURITY.md**: Security analysis documentation
+- **.github/workflows/**: CI/CD and Claude AI automation workflows
 
 ## Key Files
 
@@ -264,6 +265,12 @@ make build && make test && make security && make format-check
 - `docs/project-milestones.md` - Detailed roadmap with timelines and implementation notes
 - `docs/prompt.xml` - Original project prompt
 - `compose.yaml` - Docker compose configuration for this workspace
+
+### GitHub Workflows
+- `.github/workflows/security.yml` - Slither, dependency review, OpenSSF Scorecard security analysis
+- `.github/workflows/claude-security.yml` - AI-powered security review with educational focus
+- `.github/workflows/claude-assistant.yml` - Interactive Claude assistance via @claude mentions
+- `.github/workflows/claude-educational-review.yml` - Comprehensive educational code reviews
 
 ## Implementation Priorities
 
@@ -488,6 +495,7 @@ make format-check    # Code formatting must be consistent
 - **Threat Assessment**: Document new attack vectors introduced
 - **Gas Analysis**: Review gas costs for DoS attack resistance
 - **External Dependencies**: Audit any new library integrations
+- **AI-Assisted Reviews**: Claude provides automated security and educational analysis
 
 #### 3. Deployment Security
 - **Testnet First**: Deploy and test on testnets before mainnet
@@ -532,3 +540,52 @@ When implementing this contract, discuss:
 5. **Testing philosophy**: Unit vs integration testing in Solidity
 
 Refer to milestone documents for detailed implementation specifications and timelines.
+
+## Claude AI Integration
+
+This project leverages Claude AI for enhanced development workflows and educational support:
+
+### Available Claude Workflows
+
+#### 1. Interactive Assistant (`@claude` mentions)
+- **Trigger**: Mention `@claude` in any issue, PR comment, or review
+- **Purpose**: Get AI assistance for coding questions, debugging, and implementation guidance
+- **Educational Focus**: Provides learning-oriented explanations and teaches Web3 patterns
+- **Workflow**: `.github/workflows/claude-assistant.yml`
+
+#### 2. Automated Security Review
+- **Trigger**: Every pull request automatically
+- **Purpose**: AI-powered security analysis with smart contract focus
+- **Educational Value**: Explains vulnerabilities and provides learning context
+- **Workflow**: `.github/workflows/claude-security.yml`
+
+#### 3. Educational Code Review
+- **Trigger**: Pull requests affecting contracts, frontend, or tests
+- **Purpose**: Comprehensive educational feedback on code patterns and best practices
+- **Learning Focus**: Web3 patterns, gas optimization, testing strategies
+- **Workflow**: `.github/workflows/claude-educational-review.yml`
+
+### Setup Requirements
+
+To enable Claude AI workflows, add your Anthropic API key to repository secrets:
+```bash
+# In GitHub repo settings > Secrets and variables > Actions
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+```
+
+### Using Claude Assistant
+
+1. **Ask Questions**: Mention `@claude` in any issue or PR comment
+2. **Get Code Help**: Claude can read your codebase and provide specific guidance
+3. **Debug Issues**: Share error messages for educational debugging assistance
+4. **Learn Patterns**: Ask about Web3 concepts, security patterns, or best practices
+
+### Educational Benefits
+
+- **Learning-First Approach**: All Claude responses prioritize educational value
+- **Security Awareness**: Automated detection and explanation of vulnerabilities
+- **Pattern Recognition**: Helps identify and understand Web3 development patterns
+- **Best Practices**: Guidance aligned with Trail of Bits security standards
+- **Gas Optimization**: Educational approach to smart contract efficiency
+
+The Claude AI integration transforms this repository into an interactive learning environment where every interaction provides educational value and development guidance.

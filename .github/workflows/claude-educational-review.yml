@@ -1,0 +1,197 @@
+name: Educational Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'contracts/**'
+      - 'frontend/**'
+      - 'scripts/**'
+      - 'test/**'
+  workflow_dispatch:
+    inputs:
+      educational_focus:
+        description: 'Educational focus area'
+        required: true
+        default: 'general'
+        type: choice
+        options:
+        - general
+        - security
+        - gas-optimization
+        - web3-patterns
+        - testing-strategies
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  educational-review:
+    name: Claude Educational Code Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Setup Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install contract dependencies
+        working-directory: ./contracts
+        run: forge install
+
+      - name: Build contracts
+        working-directory: ./contracts
+        run: forge build
+
+      - name: Run tests for context
+        working-directory: ./contracts
+        run: forge test --gas-report
+        continue-on-error: true
+
+      - name: Educational Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            # Educational Code Review for "The NFT Story"
+
+            You are conducting an educational code review for a Web3 learning project.
+            Your goal is to provide comprehensive educational feedback that helps the
+            developer understand Web3 patterns, security considerations, and best practices.
+
+            ## Review Focus Areas
+
+            ### 1. Web3 Pattern Analysis
+            - **Smart Contract Design**: Analyze contract architecture and design patterns
+            - **Gas Optimization**: Identify opportunities and explain trade-offs
+            - **State Management**: Review storage patterns and efficiency
+            - **Event Design**: Evaluate event structure and indexing strategies
+            - **Standards Compliance**: Check ERC adherence and best practices
+
+            ### 2. Educational Explanations
+            For each finding, provide:
+            - **What**: Clear description of the pattern or issue
+            - **Why**: Explanation of underlying principles
+            - **How**: Step-by-step implementation guidance
+            - **Trade-offs**: Pros and cons of different approaches
+            - **Examples**: Industry examples or reference implementations
+
+            ### 3. Security Education
+            - Explain potential vulnerabilities in educational context
+            - Reference common attack vectors (reentrancy, overflow, etc.)
+            - Suggest secure alternatives with reasoning
+            - Connect security measures to gas costs
+            - Reference Trail of Bits guidelines when applicable
+
+            ### 4. Testing & Development Patterns
+            - Review test coverage and strategies
+            - Suggest additional test cases for edge conditions
+            - Explain testing best practices for smart contracts
+            - Recommend debugging and development approaches
+
+            ## Educational Questions to Address
+
+            ### Smart Contract Fundamentals
+            - Why was this storage pattern chosen over alternatives?
+            - How do gas costs influence this design decision?
+            - What are the security implications of this approach?
+            - How does this pattern scale with user growth?
+
+            ### Web3 Development
+            - How does this integrate with frontend Web3 libraries?
+            - What are the UX implications of on-chain storage?
+            - How does this affect transaction costs for users?
+            - What are the decentralization trade-offs?
+
+            ### Industry Context
+            - How does this compare to similar projects (ENS, Nouns, etc.)?
+            - What standards or patterns are being followed?
+            - What innovations or deviations are being made?
+            - What are the long-term implications of these choices?
+
+            ## Review Output Format
+
+            ### 📚 Learning Summary
+            Start with key learning points from this PR.
+
+            ### 🔍 Code Analysis
+            Detailed review of changes with educational context.
+
+            ### 💡 Improvement Opportunities
+            Specific suggestions with explanations.
+
+            ### 🎯 Next Learning Steps
+            Recommend areas for further study or implementation.
+
+            ### ❓ Discussion Questions
+            Thought-provoking questions for deeper understanding.
+
+            ## Project Context
+            - **Educational Project**: Prioritize learning over perfection
+            - **Technology Stack**: Foundry, Solidity, Next.js 14, wagmi/viem
+            - **Architecture**: Append-only arrays, fixed pricing, radical decentralization
+            - **Goals**: On-chain storytelling, community creation, Web3 education
+
+            Focus on providing actionable educational value that advances both
+            the code quality and the developer's Web3 knowledge!
+
+      - name: Generate Learning Report
+        uses: actions/github-script@v8
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Get PR details
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            // Get changed files
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const contractFiles = files.filter(f => f.filename.includes('.sol')).length;
+            const testFiles = files.filter(f => f.filename.includes('.t.sol')).length;
+            const frontendFiles = files.filter(f => f.filename.includes('frontend/')).length;
+
+            let learningAreas = [];
+            if (contractFiles > 0) learningAreas.push('Smart Contracts');
+            if (testFiles > 0) learningAreas.push('Testing Strategies');
+            if (frontendFiles > 0) learningAreas.push('Web3 Frontend');
+
+            const learningReport = `## 🎓 Educational Review Summary
+
+            **Learning Focus**: ${learningAreas.join(', ') || 'General Development'}
+            **Files Analyzed**: ${files.length} (${contractFiles} contracts, ${testFiles} tests)
+
+            ### 📊 Review Metrics
+            - **Smart Contract Changes**: ${contractFiles} files
+            - **Test Coverage**: ${testFiles} test files
+            - **Frontend Integration**: ${frontendFiles} files
+
+            ### 🎯 Educational Objectives
+            This review focuses on helping you understand:
+            ${learningAreas.map(area => `- ${area} best practices and patterns`).join('\n')}
+
+            📖 **Detailed educational feedback provided by Claude above** - look for explanations of Web3 patterns, security considerations, and implementation trade-offs.
+
+            💡 **Next Steps**: Review Claude's detailed feedback and consider the discussion questions for deeper learning.
+            `;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: learningReport
+            });
