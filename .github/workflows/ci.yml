@@ -35,14 +35,19 @@ jobs:
       - name: Build Docker services
         run: docker compose build foundry
 
+      - name: Set up permissions for Docker
+        run: |
+          sudo chown -R 1000:1000 contracts || true
+          mkdir -p contracts/out contracts/cache contracts/lib
+
       - name: Check versions
-        run: make version
+        run: DOCKER_USER="1000:1000" make version
 
       - name: Check formatting
-        run: make fmt-check
+        run: DOCKER_USER="1000:1000" make fmt-check
 
       - name: Build projects
-        run: make build
+        run: DOCKER_USER="1000:1000" make build
 
       - name: Run tests
-        run: make test
+        run: DOCKER_USER="1000:1000" make test

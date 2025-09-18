@@ -3,8 +3,16 @@
 
 # Project configuration
 PROJECT_NAME := the-nft-story
+DOCKER_USER ?=
 DOCKER_COMPOSE := docker compose -f compose.yaml -p $(PROJECT_NAME)
 DOCKER := docker
+
+# Docker user configuration for CI/CD
+ifdef DOCKER_USER
+    DOCKER_USER_FLAG := --user $(DOCKER_USER)
+else
+    DOCKER_USER_FLAG :=
+endif
 
 # Default target
 .DEFAULT_GOAL := help
@@ -24,17 +32,17 @@ help: ## Display this help message
 
 ##@ Environment Setup
 setup: ## Initialize the foundry project and install dependencies
-	$(DOCKER_COMPOSE) run --rm foundry "forge install"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge install"
 
 install: setup ## Alias for setup
 
 deps: ## Install/update foundry dependencies
-	$(DOCKER_COMPOSE) run --rm foundry "forge install"
-	$(DOCKER_COMPOSE) run --rm foundry "forge update"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge install"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge update"
 
 clean: ## Clean build artifacts
 	@echo "$(YELLOW)Cleaning dev environment...$(NC)"
-	$(DOCKER_COMPOSE) run --rm foundry "forge clean"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge clean"
 	$(DOCKER_COMPOSE) down --volumes --remove-orphans
 	$(DOCKER_COMPOSE) down --rmi all
 	$(DOCKER) system prune -f
@@ -52,20 +60,20 @@ logs: ## Show container logs
 
 ##@ Building & Compilation
 build: ## Compile smart contracts
-	$(DOCKER_COMPOSE) run --rm foundry "forge build"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge build"
 
 watch: ## Watch for changes and rebuild/test
-	$(DOCKER_COMPOSE) run --rm foundry "forge test --watch"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge test --watch"
 
 ##@ Testing
 test: build ## Run all tests
-	$(DOCKER_COMPOSE) run --rm foundry "forge test"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge test"
 
 gas-report: build ## Run tests with gas reporting
-	$(DOCKER_COMPOSE) run --rm foundry "forge test --gas-report > gas-report.txt"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge test --gas-report > gas-report.txt"
 
 test-coverage: build ## Run tests with coverage
-	$(DOCKER_COMPOSE) run --rm foundry "forge coverage"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge coverage"
 
 test-cov: test-coverage ## Alias for test-coverage
 
@@ -74,12 +82,12 @@ lint: ## Run solhint linter
 	$(DOCKER_COMPOSE) --profile tools run --rm solhint
 
 format: ## Format Solidity code
-	$(DOCKER_COMPOSE) run --rm foundry "forge fmt"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge fmt"
 
 fmt: format ## Alias for format
 
 format-check: ## Check code formatting
-	$(DOCKER_COMPOSE) run --rm foundry "forge fmt --check"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge fmt --check"
 
 fmt-check: format-check ## Alias for format-check
 
@@ -92,7 +100,7 @@ security: slither lint ## Run all security analysis tools
 
 ##@ Documentation & Inspection
 docs: ## Generate contract documentation
-	$(DOCKER_COMPOSE) run --rm foundry "forge doc --build"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge doc --build"
 	@echo "$(GREEN)Docs built at ./contracts/docs/book/index.html $(NC)"
 
 inspect: ## Inspect contract (usage: make inspect CONTRACT=ContractName)
@@ -102,13 +110,13 @@ ifndef CONTRACT
 endif
 	@echo "$(CONTRACT)" | grep -E '^[a-zA-Z][a-zA-Z0-9_]*$$' > /dev/null || { echo "$(RED)Error: CONTRACT must be a valid contract name (alphanumeric + underscore, starting with letter)$(NC)"; exit 1; }
 	@echo "$(YELLOW)::: Inspecting contract: $(CONTRACT) ABI...$(NC)"
-	$(DOCKER_COMPOSE) run --rm foundry "forge inspect $(CONTRACT) abi"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge inspect $(CONTRACT) abi"
 	@echo "$(YELLOW)::: Inspecting contract: $(CONTRACT) Bytecode...$(NC)"
-	$(DOCKER_COMPOSE) run --rm foundry "forge inspect $(CONTRACT) bytecode"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge inspect $(CONTRACT) bytecode"
 	@echo "$(YELLOW)::: Inspecting contract: $(CONTRACT) Gas Estimate...$(NC)"
-	$(DOCKER_COMPOSE) run --rm foundry "forge inspect $(CONTRACT) gasEstimates"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge inspect $(CONTRACT) gasEstimates"
 	@echo "$(YELLOW)::: Inspecting contract: $(CONTRACT) Storage Layout...$(NC)"
-	$(DOCKER_COMPOSE) run --rm foundry "forge inspect $(CONTRACT) storage-layout"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge inspect $(CONTRACT) storage-layout"
 
 ##@ Debugging
 trace: ## Trace a specific transaction (usage: make trace TX=0x...)
@@ -117,7 +125,7 @@ ifndef TX
 	@exit 1
 endif
 	@echo "$(YELLOW)Tracing transaction: $(TX)...$(NC)"
-	$(DOCKER_COMPOSE) run --rm foundry "cast run $(TX) --rpc-url http://localhost:8545"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "cast run $(TX) --rpc-url http://localhost:8545"
 
 ##@ Utilities
 status: ## Show development environment status
@@ -128,8 +136,8 @@ status: ## Show development environment status
 version: ## Show tool versions
 	@echo "$(BLUE)Version Info$(NC)"
 	@echo "============="
-	$(DOCKER_COMPOSE) run --rm foundry "forge --version"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "forge --version"
 	@echo ""
-	$(DOCKER_COMPOSE) run --rm foundry "cast --version"
+	$(DOCKER_COMPOSE) run --rm $(DOCKER_USER_FLAG) foundry "cast --version"
 
 .PHONY: help setup install deps clean shell dev logs build watch test test-gas test-coverage test-cov lint format fmt format-check fmt-check slither security docs inspect trace status version
