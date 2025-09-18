@@ -38,9 +38,6 @@ jobs:
       - name: Check versions
         run: make version
 
-      - name: Install  dependencies
-        run: make install
-
       - name: Check formatting
         run: make fmt-check
 
