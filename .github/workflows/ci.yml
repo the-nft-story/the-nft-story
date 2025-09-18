@@ -35,19 +35,28 @@ jobs:
       - name: Build Docker services
         run: docker compose build foundry
 
-      - name: Set up permissions for Docker
+      - name: Setup CI permissions
         run: |
-          sudo chown -R 1000:1000 contracts || true
-          mkdir -p contracts/out contracts/cache contracts/lib
+          # Create output directories with proper permissions for Docker
+          mkdir -p contracts/out contracts/cache contracts/lib contracts/broadcast
+          chmod -R 777 contracts/
+
+          # Show debug info
+          echo "=== CI Environment Debug ==="
+          whoami && id
+          pwd
+          ls -la
+          ls -la contracts/
+          echo "=========================="
 
       - name: Check versions
-        run: DOCKER_USER="1000:1000" make version
+        run: docker compose run --rm --user root foundry "forge --version"
 
       - name: Check formatting
-        run: DOCKER_USER="1000:1000" make fmt-check
+        run: docker compose run --rm --user root foundry "forge fmt --check"
 
       - name: Build projects
-        run: DOCKER_USER="1000:1000" make build
+        run: docker compose run --rm --user root foundry "forge build"
 
       - name: Run tests
-        run: DOCKER_USER="1000:1000" make test
+        run: docker compose run --rm --user root foundry "forge test"
