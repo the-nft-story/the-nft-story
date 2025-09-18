@@ -1,0 +1,62 @@
+name: NFT Story CI
+
+on:
+  push:
+    branches: [main, feature/*]
+  pull_request:
+    branches: [main, feature/*]
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: Check Pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker services
+        run: docker compose build foundry
+
+      - name: Setup CI permissions
+        run: |
+          # Create output directories with proper permissions for Docker
+          mkdir -p contracts/out contracts/cache contracts/lib contracts/broadcast
+          chmod -R 777 contracts/
+
+          # Show debug info
+          echo "=== CI Environment Debug ==="
+          whoami && id
+          pwd
+          ls -la
+          ls -la contracts/
+          echo "=========================="
+
+      - name: Check versions
+        run: docker compose run --rm --user root foundry "forge --version"
+
+      - name: Check formatting
+        run: docker compose run --rm --user root foundry "forge fmt --check"
+
+      - name: Build projects
+        run: docker compose run --rm --user root foundry "forge build"
+
+      - name: Run tests
+        run: docker compose run --rm --user root foundry "forge test"
